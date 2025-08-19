@@ -1,1 +1,2 @@
-web: gunicorn student_system.wsgi
+web: gunicorn student_system.wsgi:application
+
