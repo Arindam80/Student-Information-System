@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-user"></i> Student Details - {{ student.roll_number }}</h2>
+            <a href="{% url 'student_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Student Profile Form -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> Update Profile Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" value="{{ student.user.get_full_name }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Roll Number</label>
+                            <input type="text" class="form-control" value="{{ student.roll_number }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            {{ profile_form.phone }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date of Birth</label>
+                            {{ profile_form.date_of_birth }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Course</label>
+                            {{ profile_form.course }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Semester</label>
+                            {{ profile_form.semester }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        {{ profile_form.address }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Subject -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus"></i> Add Subject to Student</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'add_subject_to_student' student.id %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-8">
+                            <select name="subject_id" class="form-control" required>
+                                <option value="">Select Subject</option>
+                                {% for subject in all_subjects %}
+                                    <option value="{{ subject.id }}">{{ subject.code }} - {{ subject.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Add Subject
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Subjects -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-book"></i> Enrolled Subjects</h5>
+            </div>
+            <div class="card-body">
+                {% if subjects %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Credits</th>
+                                    <th>Enrolled Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject_enrollment in subjects %}
+                                <tr>
+                                    <td>{{ subject_enrollment.subject.code }}</td>
+                                    <td>{{ subject_enrollment.subject.name }}</td>
+                                    <td>{{ subject_enrollment.subject.credits }}</td>
+                                    <td>{{ subject_enrollment.enrolled_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No subjects enrolled yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Result -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus"></i> Add Result</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'add_result' student.id %}">
+                    {% csrf_token %}
+                    {{ result_form.as_p }}
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Result
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Results -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Results</h5>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Exam Type</th>
+                                    <th>Marks</th>
+                                    <th>Grade</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.subject.name }}</td>
+                                    <td>{{ result.exam_type }}</td>
+                                    <td>{{ result.marks_obtained }}/{{ result.total_marks }}</td>
+                                    <td>
+                                        <span class="badge {% if result.grade == 'A+' or result.grade == 'A' %}bg-success{% elif result.grade == 'B+' or result.grade == 'B' %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ result.grade }}
+                                        </span>
+                                    </td>
+                                    <td>{{ result.exam_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No results added yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Attendance -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus"></i> Add Attendance</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'add_attendance' student.id %}">
+                    {% csrf_token %}
+                    {{ attendance_form.as_p }}
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Attendance
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Attendance -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-check"></i> Attendance Records</h5>
+            </div>
+            <div class="card-body">
+                {% if attendance_records %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Month</th>
+                                    <th>Year</th>
+                                    <th>Attended</th>
+                                    <th>Total</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in attendance_records %}
+                                <tr>
+                                    <td>{{ attendance.subject.name }}</td>
+                                    <td>{{ attendance.month }}</td>
+                                    <td>{{ attendance.year }}</td>
+                                    <td>{{ attendance.classes_attended }}</td>
+                                    <td>{{ attendance.total_classes }}</td>
+                                    <td>
+                                        <span class="badge {% if attendance.attendance_percentage >= 80 %}bg-success{% elif attendance.attendance_percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ attendance.attendance_percentage }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No attendance records added yet.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

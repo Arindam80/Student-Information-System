@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Student Dashboard</h2>
+        <p class="text-muted">Welcome, {{ student.user.get_full_name }}!</p>
+    </div>
+</div>
+
+<!-- Personal Information -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-user"></i> Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ student.user.get_full_name }}</p>
+                        <p><strong>Roll Number:</strong> {{ student.roll_number }}</p>
+                        <p><strong>Email:</strong> {{ student.user.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Course:</strong> {{ student.course|default:"Not updated" }}</p>
+                        <p><strong>Semester:</strong> {{ student.semester|default:"Not updated" }}</p>
+                        <p><strong>Phone:</strong> {{ student.phone|default:"Not updated" }}</p>
+                    </div>
+                </div>
+                {% if not student.profile_completed %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Your profile is pending completion by the administrator.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subjects -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-book"></i> Enrolled Subjects</h5>
+            </div>
+            <div class="card-body">
+                {% if subjects %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Credits</th>
+                                    <th>Enrolled Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject_enrollment in subjects %}
+                                <tr>
+                                    <td>{{ subject_enrollment.subject.code }}</td>
+                                    <td>{{ subject_enrollment.subject.name }}</td>
+                                    <td>{{ subject_enrollment.subject.credits }}</td>
+                                    <td>{{ subject_enrollment.enrolled_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No subjects enrolled yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Results -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Academic Results</h5>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Exam Type</th>
+                                    <th>Marks</th>
+                                    <th>Total</th>
+                                    <th>Grade</th>
+                                    <th>Exam Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.subject.name }}</td>
+                                    <td>{{ result.exam_type }}</td>
+                                    <td>{{ result.marks_obtained }}</td>
+                                    <td>{{ result.total_marks }}</td>
+                                    <td>
+                                        <span class="badge {% if result.grade == 'A+' or result.grade == 'A' %}bg-success{% elif result.grade == 'B+' or result.grade == 'B' %}bg-warning{% elif result.grade == 'C+' or result.grade == 'C' %}bg-info{% else %}bg-danger{% endif %}">
+                                            {{ result.grade }}
+                                        </span>
+                                    </td>
+                                    <td>{{ result.exam_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No results available yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-check"></i> Attendance Records</h5>
+            </div>
+            <div class="card-body">
+                {% if attendance_records %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Month</th>
+                                    <th>Year</th>
+                                    <th>Classes Attended</th>
+                                    <th>Total Classes</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for attendance in attendance_records %}
+                                <tr>
+                                    <td>{{ attendance.subject.name }}</td>
+                                    <td>{{ attendance.month }}</td>
+                                    <td>{{ attendance.year }}</td>
+                                    <td>{{ attendance.classes_attended }}</td>
+                                    <td>{{ attendance.total_classes }}</td>
+                                    <td>
+                                        <span class="badge {% if attendance.attendance_percentage >= 80 %}bg-success{% elif attendance.attendance_percentage >= 60 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ attendance.attendance_percentage }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No attendance records available yet.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
